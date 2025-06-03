@@ -80,7 +80,8 @@ export default function Login() {
       <form className="bg-white p-8 rounded shadow w-full max-w-sm space-y-6" onSubmit={handleSubmit}>
         <h1 className="text-2xl font-bold mb-4 text-center">Login</h1>
         <div>
-          <label className="block mb-1 font-medium">Email</label>
+        <div className="mb-1 text-left">
+          <label className="block mb-1 font-medium">Email</label></div>
           <input
             type="email"
             className="w-full border px-3 py-2 rounded"
@@ -91,7 +92,8 @@ export default function Login() {
           />
         </div>
         <div>
-          <label className="block mb-1 font-medium">Password</label>
+        <div className="mb-1 text-left">
+          <label className="block mb-1 font-medium">Password</label></div>
           <input
             type="password"
             className="w-full border px-3 py-2 rounded"
@@ -101,9 +103,28 @@ export default function Login() {
             required
           />
         </div>
-
-        {error && <div className="text-red-500 text-center">{error}</div>}
-        <button type="submit" className="w-full bg-blue-500 text-white px-4 py-2 rounded">Log In</button>
+        <button
+          type="submit"
+          className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors"
+        >
+          Login
+        </button>
+        <div className="text-center mt-4">
+          <p className="text-sm text-gray-600">
+            Don't have an account?{' '}
+            <a 
+              href="/register" 
+              className="text-blue-600 hover:underline"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate('/register');
+              }}
+            >
+              Register here
+            </a>
+          </p>
+        </div>
+        {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
       </form>
     </div>
   );

@@ -318,9 +318,6 @@ export default function UserManagementTable() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -359,29 +356,6 @@ export default function UserManagementTable() {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <button
-                        onClick={() => handleStatusChange(
-                          user.id, 
-                          user.status === 'active' ? 'inactive' : 'active'
-                        )}
-                        className={`mr-3 ${
-                          user.status === 'active' 
-                            ? 'text-yellow-600 hover:text-yellow-900' 
-                            : 'text-green-600 hover:text-green-900'
-                        }`}
-                        disabled={loading}
-                      >
-                        {user.status === 'active' ? 'Deactivate' : 'Activate'}
-                      </button>
-                      {isAdminOrOwner && (
-                        <button
-                          onClick={() => handleDeleteUser(user.id)}
-                          className="text-red-600 hover:text-red-900"
-                          disabled={loading}
-                        >
-                          Delete
-                        </button>
-                      )}
                     </td>
                   </tr>
                 ))
