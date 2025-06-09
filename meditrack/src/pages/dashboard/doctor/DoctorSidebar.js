@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 
-export default function StaffSidebar({ activePage = 'reports' }) {
+export default function DoctorSidebar() {
   const navigate = useNavigate();
   
   const handleLogout = () => {
@@ -13,16 +13,17 @@ export default function StaffSidebar({ activePage = 'reports' }) {
   };
 
   const navItems = [
-    { to: '/dashboard/staff', icon: '📊', label: 'Reports', id: 'reports' },
-    { to: '/dashboard/user-management', icon: '👥', label: 'User Management', id: 'user-management' },
-    { to: '/dashboard/staff/appointments', icon: '📅', label: 'Appointments', id: 'appointments' },
-    { to: '/dashboard/settings', icon: '⚙️', label: 'Settings', id: 'settings' },
-  ];
+    { to: '/dashboard/doctor', icon: '', label: 'Dashboard', id: 'dashboard' },
+    { to: '/dashboard/doctor/patients', icon: '👥', label: 'Patients', id: 'patients' },
+    { to: '/dashboard/doctor/reports', icon: '📊', label: 'Reports', id: 'reports' },
+    { to: '/dashboard/doctor/appointments', icon: '📅', label: 'Appointments', id: 'appointments' },
+    { to: '/dashboard/doctor/prescriptions', icon: '💊', label: 'Prescriptions', id: 'prescriptions' },
+];
   
 
   return (
-    <aside className="w-60 h-screen bg-white shadow p-6 space-y-6 fixed left-0 top-0 z-30 hidden md:block">
-      <div className="text-xl font-bold text-blue-600">EMR</div>
+    <aside className="w-60 h-screen bg-white shadow p-6 space-y-6 fixed left-0 top-0 z-30 overflow-y-auto">
+      <div className="text-xl font-bold text-blue-600 mb-8">MediTrack</div>
       <nav className="space-y-2 text-gray-700 mt-8">
         {navItems.map((item) => (
           <NavLink

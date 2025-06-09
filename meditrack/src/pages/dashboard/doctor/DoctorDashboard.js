@@ -1,5 +1,6 @@
 import React from 'react';
 import { mockReports, mockPatients, mockPrescriptions, mockSchedule } from '../../../data/mockDoctorData';
+import DoctorSidebar from './DoctorSidebar';
 
 export default function DoctorDashboard() {
   // Mock overview stats
@@ -8,24 +9,10 @@ export default function DoctorDashboard() {
   const completedThisWeek = 12; // placeholder
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="w-full bg-white shadow px-6 py-4 flex justify-between items-center sticky top-0 z-10">
-        <h1 className="text-xl font-semibold">Doctor Dashboard</h1>
-        <button className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition">Logout</button>
-      </header>
-      {/* Main Layout */}
-      <div className="flex flex-col md:flex-row">
-        {/* Sidebar */}
-        <aside className="w-full md:w-52 bg-white shadow-md p-4 md:min-h-screen">
-          <nav className="space-y-2">
-            <a href="#" className="block text-blue-700 font-semibold">Dashboard</a>
-            <a href="#" className="block text-gray-700">Patients</a>
-            <a href="#" className="block text-gray-700">Reports</a>
-          </nav>
-        </aside>
+    <div className="min-h-screen bg-gray-50 flex">
+        <DoctorSidebar />
         {/* Main Content */}
-        <main className="flex-1 p-4 md:p-8">
+        <main className="flex-1 ml-60 p-8">
           {/* Overview Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 my-4">
             <div className="bg-blue-100 p-4 rounded shadow text-center">
@@ -101,6 +88,5 @@ export default function DoctorDashboard() {
           </div>
         </main>
       </div>
-    </div>
   );
 }
