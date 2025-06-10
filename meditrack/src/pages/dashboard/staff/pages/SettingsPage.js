@@ -50,7 +50,6 @@ export default function SettingsPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <StaffSidebar activePage="settings" />
-      <div className="ml-0 md:ml-60 p-6">
         <h1 className="text-2xl font-bold mb-6">Settings</h1>
         
         <div className="bg-white rounded-lg shadow overflow-hidden">
@@ -292,6 +291,5 @@ export default function SettingsPage() {
           </div>
         </div>
       </div>
-    </div>
   );
 }
