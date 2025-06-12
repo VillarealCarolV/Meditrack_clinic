@@ -22,6 +22,7 @@ import PendingApprovals from './components/PendingApprovals';
 import QuickActions from './components/QuickActions';
 import ActivityFeed from './components/ActivityFeed';
 import OwnerSidebar from './components/OwnerSidebar';
+import RoleBasedHelpBot from '../../../components/RoleBasedHelpBot';
 
 // Mock data (replace with real API calls)
 const mockStats = {
@@ -158,6 +159,7 @@ export default function OwnerDashboard() {
       </div>
         </div>
       </main>
+      <RoleBasedHelpBot role="owner" />
     </div>
   );
 }

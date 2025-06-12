@@ -6,6 +6,7 @@ import NurseNotesPanel from './NurseNotesPanel';
 import MedicationLogTable from './MedicationLogTable';
 import CriticalFlagPanel from './CriticalFlagPanel';
 import { mockRecords, mockVitals, mockNotes, mockMedLogs, mockIntake, mockFlags } from '../../../data/mockNurseData';
+import RoleBasedHelpBot from '../../../components/RoleBasedHelpBot';
 
 export default function NurseDashboard() {
   return (
@@ -21,6 +22,7 @@ export default function NurseDashboard() {
         <section id="medications"><MedicationLogTable medLogs={mockMedLogs} /></section>
         <section id="flags"><CriticalFlagPanel flags={mockFlags} /></section>
       </div>
+      <RoleBasedHelpBot role="nurse" />
     </div>
   );
 }

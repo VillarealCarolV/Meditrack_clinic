@@ -1,6 +1,7 @@
 import React from 'react';
 import { mockReports, mockPatients, mockPrescriptions, mockSchedule } from '../../../data/mockDoctorData';
 import DoctorSidebar from './DoctorSidebar';
+import RoleBasedHelpBot from '../../../components/RoleBasedHelpBot';
 
 export default function DoctorDashboard() {
   // Mock overview stats
@@ -87,6 +88,10 @@ export default function DoctorDashboard() {
             <p>Coming soon: patient activity chart, diagnosis stats, etc.</p>
           </div>
         </main>
-      </div>
+        
+      <RoleBasedHelpBot role="doctor" />
+    </div>
+      
+      
   );
 }

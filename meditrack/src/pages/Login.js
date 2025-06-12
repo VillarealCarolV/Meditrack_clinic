@@ -1,19 +1,22 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
+import { useAuth } from '../../AuthContext';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const { login, user } = useAuth();
+  
   // Redirect if already logged in
   React.useEffect(() => {
-    const user = JSON.parse(localStorage.getItem('user'));
     if (user && user.role) {
       // Map roles to dashboards
       const roleToDashboard = {
-        admin: '/dashboard/staff',
+        admin: '/dashboard/admin',
         staff: '/dashboard/staff',
         owner: '/dashboard/owner',
         doctor: '/dashboard/doctor',
@@ -22,56 +25,21 @@ export default function Login() {
       };
       const dashboard = roleToDashboard[user.role];
       if (dashboard) {
-        navigate(dashboard);
+        navigate(dashboard, { replace: true });
       }
     }
-  }, [navigate]);
+  }, [user, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    console.log('Submitting login form');
-    console.log('Email:', email, 'Password:', password);
     
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/login`, {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ email, password })
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Login failed. Please check your credentials.');
-      }
-      
-      const data = await response.json();
-      console.log('Login successful. Response:', data);
-      
-      // Save JWT and user info
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
-      console.log('User data saved to localStorage');
-      // Redirect to dashboard for user role
-      // Map roles to dashboards
-      const roleToDashboard = {
-        admin: '/dashboard/staff',
-        staff: '/dashboard/staff',
-        owner: '/dashboard/owner',
-        doctor: '/dashboard/doctor',
-        nurse: '/dashboard/nurse',
-        patient: '/dashboard/patient',
-      };
-      const dashboard = roleToDashboard[data.user.role];
-      console.log('Redirecting to:', dashboard, 'User:', data.user);
-      if (dashboard) {
-        navigate(dashboard, { replace: true });
-      }
+      await login(email, password);
+      // The AuthContext will handle the redirection in the useEffect above
     } catch (err) {
       console.error('Login error:', err);
-      setError(err.message || 'Failed to log in. Please check your network connection and try again.');
+      setError(err.message || 'Failed to log in. Please check your credentials and try again.');
     }
   };
 
@@ -92,16 +60,31 @@ export default function Login() {
           />
         </div>
         <div>
-        <div className="mb-1 text-left">
-          <label className="block mb-1 font-medium">Password</label></div>
-          <input
-            type="password"
-            className="w-full border px-3 py-2 rounded"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            placeholder="Enter your password"
-            required
-          />
+          <div className="mb-1 text-left">
+            <label className="block mb-1 font-medium">Password</label>
+          </div>
+          <div className="relative">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              className="w-full border px-3 py-2 pr-10 rounded"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              placeholder="••••••••"
+              required
+            />
+            <button
+              type="button"
+              className="absolute inset-y-0 right-0 pr-3 flex items-center"
+              onClick={() => setShowPassword(!showPassword)}
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+            >
+              {showPassword ? (
+                <EyeSlashIcon className="h-5 w-5 text-gray-500" />
+              ) : (
+                <EyeIcon className="h-5 w-5 text-gray-500" />
+              )}
+            </button>
+          </div>
         </div>
         <button
           type="submit"

@@ -1,7 +1,8 @@
 import { Routes, Route, Navigate, unstable_HistoryRouter as Router } from 'react-router-dom';
 import { createBrowserHistory } from 'history';
-import { AuthProvider } from './AuthContext';
+import { AuthProvider, useAuth } from './AuthContext';
 import Navbar from './Navbar';
+import { useLocation } from 'react-router-dom';
 import ProtectedRoute from './routes/ProtectedRoute';
 import Unauthorized from './Unauthorized';
 import Login from './pages/Login';
@@ -14,11 +15,57 @@ import OwnerDashboard from './pages/dashboard/owner/OwnerDashboard';
 import AdminDashboard from './pages/dashboard/admin/AdminDashboard';
 import ReportsPage from './pages/dashboard/staff/pages/ReportsPage';
 import UserManagementPage from './pages/dashboard/staff/pages/UserManagementPage';
-import AppointmentsPage from './pages/dashboard/staff/pages/AppointmentsPage';
 import AppointmentManagementPanel from './pages/dashboard/staff/AppointmentManagementPanel';
 import SettingsPage from './pages/dashboard/staff/pages/SettingsPage';
 import Appointments from './pages/dashboard/doctor/Appointments';
 import './App.css';
+
+// Component to check authentication and redirect accordingly
+const RoleBasedHelpBotWrapper = () => {
+  const { user } = useAuth();
+  const location = useLocation();
+
+  
+  if (location.pathname === '/login' || 
+      location.pathname === '/register' || 
+      location.pathname === '/unauthorized') {
+    return null;
+  }
+
+  
+  if (!user) {
+    return null;
+  }
+
+  return null; 
+};
+
+
+const AuthCheck = ({ children }) => {
+  const { user } = useAuth();
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // Redirect to appropriate dashboard based on user role
+  switch(user.role) {
+    case 'admin':
+      return <Navigate to="/dashboard/admin" replace />;
+    case 'doctor':
+      return <Navigate to="/dashboard/doctor" replace />;
+    case 'nurse':
+      return <Navigate to="/dashboard/nurse" replace />;
+    case 'staff':
+      return <Navigate to="/dashboard/staff" replace />;
+    case 'owner':
+      return <Navigate to="/dashboard/owner" replace />;
+    case 'patient':
+      return <Navigate to="/dashboard/patient" replace />;
+    default:
+      return <Navigate to="/login" replace />;
+  }
+};
 
 const history = createBrowserHistory({
   future: {
@@ -94,7 +141,14 @@ function App() {
           {/* Fallback: redirect to login if no match */}
           <Route path="*" element={<Navigate to="/login" replace />} />
           <Route path="/unauthorized" element={<Unauthorized />} />
-          <Route path="/" element={<h1 className="text-3xl text-red-300 bg-slate-600">Welcome</h1>} />
+          <Route 
+            path="/" 
+            element={
+              <AuthCheck>
+                <h1 className="text-3xl text-red-300 bg-slate-600">Welcome</h1>
+              </AuthCheck>
+            } 
+          />
           </Routes>
         </div>
       </Router>

@@ -4,6 +4,7 @@ import TopBar from '../../../components/TopBar';
 import Appointments from '../../../components/Appointments';
 import Prescriptions from '../../../components/Prescriptions';
 import Scheduling from '../../../components/Scheduling';
+import RoleBasedHelpBot from '../../../components/RoleBasedHelpBot';
 
 export default function PatientDashboard() {
   const patientName = 'John Doe';
@@ -52,6 +53,7 @@ export default function PatientDashboard() {
           </section>
         </div>
       </div>
+      <RoleBasedHelpBot role="patient" />
     </div>
   );
 }
