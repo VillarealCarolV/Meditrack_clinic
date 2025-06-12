@@ -153,60 +153,59 @@ const [filteredAppointments, setFilteredAppointments] = useState([...mockAppoint
   }));
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex">
       <StaffSidebar activePage="appointments" />
-      <div className="flex-1 p-6 ml-60">
-        <div className="bg-white p-6 rounded-lg shadow">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">Appointment Management</h2>
+        <div className="bg-white p-6 rounded-lg shadow h-full">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold text-gray-800">Appointment Management</h2>
 
-        <div className="flex space-x-2">
-          <button 
-            onClick={() => setView('list')} 
-            className={`flex items-center px-4 py-2 rounded-lg ${view === 'list' ? 'bg-blue-500 text-white' : 'bg-gray-100'}`}
-          >
-            <List size={16} className="mr-2" /> List View
-          </button>
-          <button 
-            onClick={() => setView('calendar')} 
-            className={`flex items-center px-4 py-2 rounded-lg ${view === 'calendar' ? 'bg-blue-500 text-white' : 'bg-gray-100'}`}
-          >
-            <CalendarIcon size={16} className="mr-2" /> Calendar View
-          </button>
-        </div>
-      </div>
+            <div className="flex space-x-2">
+              <button 
+                onClick={() => setView('list')} 
+                className={`flex items-center px-4 py-2 rounded-lg ${view === 'list' ? 'bg-blue-500 text-white' : 'bg-gray-100'}`}
+              >
+                <List size={16} className="mr-2" /> List View
+              </button>
+              <button 
+                onClick={() => setView('calendar')} 
+                className={`flex items-center px-4 py-2 rounded-lg ${view === 'calendar' ? 'bg-blue-500 text-white' : 'bg-gray-100'}`}
+              >
+                <CalendarIcon size={16} className="mr-2" /> Calendar View
+              </button>
+            </div>
+          </div>
 
-      {/* Filters */}
-      <div className="bg-gray-50 p-4 rounded-lg mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Doctor</label>
-            <select 
-              className="w-full p-2 border rounded-md"
-              value={filters.doctor}
-              onChange={(e) => handleFilterChange('doctor', e.target.value)}
-            >
-              <option value="">All Doctors</option>
-              {mockDoctors.map(doctor => (
-                <option key={doctor.id} value={doctor.name}>{doctor.name}</option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
-            <input 
-              type="date" 
-              className="w-full p-2 border rounded-md"
-              value={filters.date}
-              onChange={(e) => handleFilterChange('date', e.target.value)}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-            <select 
-              className="w-full p-2 border rounded-md"
-              value={filters.status}
-              onChange={(e) => handleFilterChange('status', e.target.value)}
+          {/* Filters */}
+          <div className="bg-gray-50 p-4 rounded-lg mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Doctor</label>
+                <select 
+                  className="w-full p-2 border rounded-md"
+                  value={filters.doctor}
+                  onChange={(e) => handleFilterChange('doctor', e.target.value)}
+                >
+                  <option value="">All Doctors</option>
+                  {mockDoctors.map(doctor => (
+                    <option key={doctor.id} value={doctor.name}>{doctor.name}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                <input 
+                  type="date" 
+                  className="w-full p-2 border rounded-md"
+                  value={filters.date}
+                  onChange={(e) => handleFilterChange('date', e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                <select 
+                  className="w-full p-2 border rounded-md"
+                  value={filters.status}
+                  onChange={(e) => handleFilterChange('status', e.target.value)}
             >
               <option value="">All Status</option>
               <option value="pending">Pending</option>
@@ -611,8 +610,8 @@ const [filteredAppointments, setFilteredAppointments] = useState([...mockAppoint
           </div>
         </div>
       )}
-        </div>
-      </div>
     </div>
+    </div>   
+
   );
 }

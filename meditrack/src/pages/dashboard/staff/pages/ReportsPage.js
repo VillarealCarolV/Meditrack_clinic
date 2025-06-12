@@ -15,7 +15,6 @@ export default function ReportsPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <StaffSidebar activePage="reports" />
-      <div className="ml-0 md:ml-60 p-6">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Reports & Analytics</h1>
         </div>
@@ -37,6 +36,5 @@ export default function ReportsPage() {
         
         {/* Add more report components here */}
       </div>
-    </div>
   );
 }

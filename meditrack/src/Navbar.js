@@ -1,8 +1,17 @@
+<<<<<<< HEAD
 import React, { useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { Menu, Transition } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon, UserCircleIcon } from '@heroicons/react/24/outline';
+=======
+// In Navbar.js
+import React, { useEffect, useMemo } from 'react';
+import { useAuth } from './AuthContext';
+import { useNavigate, useLocation } from 'react-router-dom';
+
+const roles = ['patient', 'doctor', 'nurse', 'staff', 'owner'];
+>>>>>>> 7ec000fd201a033c256292f5b042e01028fefa90
 
 const roleToDashboard = {
   patient: '/dashboard/patient',
@@ -17,11 +26,16 @@ const Navbar = () => {
   const { user: contextUser, logout } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const isDev = process.env.NODE_ENV === 'development';
 
-  // Try to get user from localStorage if context is null
-  const user = contextUser || JSON.parse(localStorage.getItem('user'));
+  // Memoize the user to prevent unnecessary re-renders
+  const user = useMemo(() => 
+    contextUser || JSON.parse(localStorage.getItem('user') || 'null'),
+    [contextUser]
+  );
 
+<<<<<<< HEAD
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
@@ -30,6 +44,15 @@ const Navbar = () => {
     logout();
     navigate('/login');
   };
+=======
+  // Only navigate if we're not already on the target page
+  useEffect(() => {
+    if (user?.role && roleToDashboard[user.role] && 
+        !location.pathname.startsWith(roleToDashboard[user.role])) {
+      navigate(roleToDashboard[user.role]);
+    }
+  }, [user, navigate, location.pathname]);
+>>>>>>> 7ec000fd201a033c256292f5b042e01028fefa90
 
   return (
     <nav className="bg-white shadow-sm">
@@ -144,6 +167,7 @@ const Navbar = () => {
           </div>
         </div>
       </div>
+<<<<<<< HEAD
 
       {/* Mobile menu, show/hide based on menu state */}
       {isOpen && (
@@ -196,8 +220,10 @@ const Navbar = () => {
           </div>
         </div>
       )}
+=======
+>>>>>>> 7ec000fd201a033c256292f5b042e01028fefa90
     </nav>
   );
 };
 
-export default Navbar;
+export default React.memo(Navbar);

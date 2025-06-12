@@ -9,7 +9,6 @@ export default function UserManagementPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <StaffSidebar activePage="user-management" />
-      <div className="ml-0 md:ml-60 p-6">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">User Management</h1>
         </div>
@@ -18,6 +17,5 @@ export default function UserManagementPage() {
           <UserManagementTable />
         </div>
       </div>
-    </div>
   );
 }
