@@ -48,7 +48,7 @@ export default function AdminDashboard() {
       </button>
 
       {/* Sidebar */}
-      <div className={`admin-sidebar ${sidebarOpen ? 'open' : ''}`}>
+      <div className={` ${sidebarOpen ? 'open' : ''}`}>
         <AdminSidebar />
       </div>
 

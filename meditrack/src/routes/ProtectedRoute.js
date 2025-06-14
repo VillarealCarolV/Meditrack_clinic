@@ -8,7 +8,7 @@ export default function ProtectedRoute({ allowedRoles, children }) {
 
   // Map backend roles to effective frontend roles for access control
   const roleMap = {
-    admin: 'staff',
+    admin: 'admin',
     owner: 'owner',
     staff: 'staff',
     doctor: 'doctor',

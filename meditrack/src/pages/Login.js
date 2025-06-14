@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
-import { useAuth } from '../../AuthContext';
+import { useAuth } from '../AuthContext';
 
 export default function Login() {
   const [email, setEmail] = useState('');
