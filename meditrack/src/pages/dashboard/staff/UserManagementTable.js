@@ -5,6 +5,12 @@ export default function UserManagementTable() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [showModal, setShowModal] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [roleFilter, setRoleFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
+  
+  // Form state
   const [form, setForm] = useState({ 
     fullName: '',
     phoneNumber: '',
@@ -12,16 +18,25 @@ export default function UserManagementTable() {
     password: '', 
     role: 'patient' 
   });
-  const [loading, setLoading] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [roleFilter, setRoleFilter] = useState('all');
-  const [statusFilter, setStatusFilter] = useState('all');
 
   // Get current user from localStorage
   const user = JSON.parse(localStorage.getItem('user'));
-  const isOwner = user?.role === 'owner';
-  const isAdminOrOwner = user && (user.role === 'admin' || user.role === 'owner');
+  const isAdmin = user?.role === 'admin';
+  const isReceptionist = user?.role === 'receptionist';
+  
+  // Define allowed roles for the current user
+  const getAllowedRoles = () => {
+    if (isAdmin) {
+      return ['admin', 'receptionist', 'doctor', 'nurse', 'patient'];
+    } else if (isReceptionist) {
+      return ['patient']; // Receptionists can only manage patients
+    }
+    return [];
+  };
+  
+  const allowedRoles = getAllowedRoles();
 
+  // Fetch users from the API
   const fetchUsers = async () => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -33,7 +48,6 @@ export default function UserManagementTable() {
     setError('');
     
     try {
-      console.log('Fetching users from:', `${process.env.REACT_APP_API_URL}/api/users`);
       const response = await fetch(`${process.env.REACT_APP_API_URL}/api/users`, {
         method: 'GET',
         headers: { 
@@ -41,8 +55,6 @@ export default function UserManagementTable() {
           'Content-Type': 'application/json'
         }
       });
-
-      console.log('Users response status:', response.status);
       
       if (!response.ok) {
         const errorText = await response.text();
@@ -57,8 +69,7 @@ export default function UserManagementTable() {
       }
       
       const data = await response.json();
-      console.log('Users data:', data);
-      setUsers(Array.isArray(data) ? data : []);
+      setUsers(data);
     } catch (err) {
       console.error('Error fetching users:', err);
       setError(err.message || 'Failed to fetch users. Please try again.');
@@ -67,10 +78,30 @@ export default function UserManagementTable() {
     }
   };
 
+  // Initial data fetch
   useEffect(() => {
     fetchUsers();
   }, []);
 
+  // Filter users based on role, search term, and permissions
+  const filteredUsers = users.filter(user => {
+    // Only show users with roles that the current user is allowed to manage
+    if (!allowedRoles.includes(user.role)) {
+      return false;
+    }
+    
+    const matchesSearch = 
+      user.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.phoneNumber?.toLowerCase().includes(searchTerm.toLowerCase());
+      
+    const matchesRole = roleFilter === 'all' || user.role === roleFilter;
+    const matchesStatus = statusFilter === 'all' || user.status === statusFilter;
+    
+    return matchesSearch && matchesRole && matchesStatus;
+  });
+
+  // Handle form input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setForm(prev => ({
@@ -79,6 +110,7 @@ export default function UserManagementTable() {
     }));
   };
 
+  // Reset form to initial state
   const resetForm = () => {
     setForm({
       fullName: '',
@@ -90,6 +122,7 @@ export default function UserManagementTable() {
     setError('');
   };
 
+  // Open/close modal handlers
   const openModal = () => {
     resetForm();
     setShowModal(true);
@@ -100,6 +133,7 @@ export default function UserManagementTable() {
     resetForm();
   };
 
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -114,7 +148,7 @@ export default function UserManagementTable() {
       return;
     }
     
-    // Simple phone number validation (basic check for numbers and common separators)
+    // Phone number validation
     const phoneRegex = /^[0-9\-\+\(\)\s]+$/;
     if (!phoneRegex.test(form.phoneNumber)) {
       setError('Please enter a valid phone number');
@@ -132,7 +166,6 @@ export default function UserManagementTable() {
     setSuccess('');
     
     try {
-      console.log('Creating user with data:', form);
       const response = await fetch(`${process.env.REACT_APP_API_URL}/api/users`, {
         method: 'POST',
         headers: {
@@ -142,11 +175,8 @@ export default function UserManagementTable() {
         body: JSON.stringify(form)
       });
       
-      console.log('Create user response status:', response.status);
-      
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('Error response:', errorText);
         let errorData;
         try {
           errorData = JSON.parse(errorText);
@@ -157,7 +187,6 @@ export default function UserManagementTable() {
       }
       
       const data = await response.json();
-      console.log('User created:', data);
       setSuccess('User created successfully!');
       resetForm();
       setShowModal(false);
@@ -170,6 +199,7 @@ export default function UserManagementTable() {
     }
   };
 
+  // Handle user status change
   const handleStatusChange = async (userId, newStatus) => {
     if (!window.confirm(`Are you sure you want to ${newStatus} this user?`)) {
       return;
@@ -185,7 +215,6 @@ export default function UserManagementTable() {
     setError('');
     
     try {
-      console.log(`Updating user ${userId} status to ${newStatus}`);
       const response = await fetch(`${process.env.REACT_APP_API_URL}/api/users/${userId}/status`, {
         method: 'PATCH',
         headers: {
@@ -195,11 +224,8 @@ export default function UserManagementTable() {
         body: JSON.stringify({ status: newStatus })
       });
       
-      console.log('Update status response status:', response.status);
-      
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('Error response:', errorText);
         let errorData;
         try {
           errorData = JSON.parse(errorText);
@@ -209,10 +235,9 @@ export default function UserManagementTable() {
         throw new Error(errorData.message || 'Failed to update user status');
       }
       
-      const data = await response.json();
-      console.log('User status updated:', data);
+      await response.json();
       setSuccess(`User ${newStatus} successfully!`);
-      fetchUsers(); 
+      fetchUsers();
     } catch (err) {
       console.error('Error updating user status:', err);
       setError(err.message || 'Failed to update user status. Please try again.');
@@ -225,11 +250,10 @@ export default function UserManagementTable() {
   const getRoleDisplayName = (role) => {
     const roleMap = {
       admin: 'Administrator',
-      staff: 'Staff',
+      receptionist: 'Receptionist',
       doctor: 'Doctor',
       nurse: 'Nurse',
-      patient: 'Patient',
-      owner: 'Owner'
+      patient: 'Patient'
     };
     return roleMap[role] || role;
   };
@@ -269,30 +293,6 @@ export default function UserManagementTable() {
     }
   };
 
-  // Filter and sort users
-  const filteredUsers = users
-    .filter(user => {
-      // Search filter
-      const matchesSearch = 
-        user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (user.fullName && user.fullName.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (user.phoneNumber && user.phoneNumber.includes(searchTerm));
-      
-      // Role filter
-      const matchesRole = roleFilter === 'all' || user.role === roleFilter;
-      
-      // Status filter
-      const matchesStatus = statusFilter === 'all' || user.status === statusFilter;
-      
-      return matchesSearch && matchesRole && matchesStatus;
-    })
-    .sort((a, b) => {
-      if (a.role !== b.role) {
-        return a.role.localeCompare(b.role);
-      }
-      return (a.fullName || '').localeCompare(b.fullName || '');
-    });
-
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-6">User Management</h1>
@@ -327,8 +327,8 @@ export default function UserManagementTable() {
             className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="all">All Roles</option>
-            {isOwner && <option value="admin">Administrator</option>}
-            <option value="staff">Staff</option>
+            {isAdmin && <option value="admin">Administrator</option>}
+            <option value="receptionist">Receptionist</option>
             <option value="doctor">Doctor</option>
             <option value="nurse">Nurse</option>
             <option value="patient">Patient</option>
@@ -342,12 +342,15 @@ export default function UserManagementTable() {
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
           </select>
-          <button
-            onClick={openModal}
-            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors whitespace-nowrap"
-          >
-            Add New User
-          </button>
+          {(isAdmin || isReceptionist) && (
+            <button
+              onClick={openModal}
+              className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors whitespace-nowrap"
+              disabled={loading}
+            >
+              Add New User
+            </button>
+          )}
         </div>
       </div>
 
@@ -435,10 +438,10 @@ export default function UserManagementTable() {
                     className="w-full border border-gray-300 rounded-md px-3 py-2"
                     required
                   >
-                    {isOwner && <option value="admin">Administrator</option>}
-                    <option value="staff">Staff</option>
-                    <option value="doctor">Doctor</option>
-                    <option value="nurse">Nurse</option>
+                    {isAdmin && <option value="admin">Administrator</option>}
+                    {isAdmin && <option value="receptionist">Receptionist</option>}
+                    {isAdmin && <option value="doctor">Doctor</option>}
+                    {isAdmin && <option value="nurse">Nurse</option>}
                     <option value="patient">Patient</option>
                   </select>
                 </div>
@@ -492,90 +495,100 @@ export default function UserManagementTable() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
                 </th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {loading && users.length === 0 ? (
                 <tr>
-                  <td colSpan="4" className="px-6 py-4 text-center text-gray-500">
+                  <td colSpan="5" className="px-6 py-4 text-center text-gray-500">
                     Loading users...
                   </td>
                 </tr>
-              ) : users.length === 0 ? (
+              ) : filteredUsers.length === 0 ? (
                 <tr>
-                  <td colSpan="4" className="px-6 py-4 text-center text-gray-500">
+                  <td colSpan="5" className="px-6 py-4 text-center text-gray-500">
                     No users found
                   </td>
                 </tr>
-              ) : (() => {
-                const filteredUsers = users
-                  // Apply filters
-                  .filter(user => {
-                    // Search filter
-                    const matchesSearch = 
-                      user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                      (user.fullName && user.fullName.toLowerCase().includes(searchTerm.toLowerCase())) ||
-                      (user.phoneNumber && user.phoneNumber.includes(searchTerm));
-                    
-                    // Role filter
-                    const matchesRole = roleFilter === 'all' || user.role === roleFilter;
-                    
-                    // Status filter
-                    const matchesStatus = statusFilter === 'all' || user.status === statusFilter;
-                    
-                    return matchesSearch && matchesRole && matchesStatus;
-                  })
-                  // Sort users by role and then by name
-                  .sort((a, b) => {
-                    if (a.role !== b.role) {
-                      return a.role.localeCompare(b.role);
-                    }
-                    return (a.fullName || '').localeCompare(b.fullName || '');
-                  });
-
-                if (filteredUsers.length === 0) {
-                  return (
-                    <tr key="no-results">
-                      <td colSpan="5" className="px-6 py-4 text-center text-gray-500">
-                        No users found matching the criteria
-                      </td>
-                    </tr>
-                  );
-                }
-
-
-                return filteredUsers.map((user) => (
+              ) : (
+                filteredUsers.map((user) => (
                   <tr key={user.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">{user.fullName || 'N/A'}</div>
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0 h-10 w-10">
+                          <img 
+                            className="h-10 w-10 rounded-full" 
+                            src={user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.fullName || '')}&background=random`} 
+                            alt={user.fullName} 
+                          />
+                        </div>
+                        <div className="ml-4">
+                          <div className="text-sm font-medium text-gray-900">{user.fullName}</div>
+                          <div className="text-sm text-gray-500">{user.email}</div>
+                        </div>
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{user.email}</div>
-                      <div className="text-sm text-gray-500">{user.phoneNumber || 'No phone'}</div>
+                      <div className="text-sm text-gray-900">{user.phoneNumber}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                        user.role === 'admin' ? 'bg-purple-100 text-purple-800' :
+                        user.role === 'receptionist' ? 'bg-blue-100 text-blue-800' :
+                        user.role === 'doctor' ? 'bg-green-100 text-green-800' :
+                        user.role === 'nurse' ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-gray-100 text-gray-800'
+                      }`}>
                         {getRoleDisplayName(user.role)}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span 
-                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          user.status === 'active' 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-red-100 text-red-800'
-                        }`}
-                      >
+                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                        user.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                      }`}>
                         {user.status === 'active' ? 'Active' : 'Inactive'}
                       </span>
                     </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <div className="flex justify-end space-x-2">
+                        {user.status === 'active' ? (
+                          <button
+                            onClick={() => handleStatusChange(user.id, 'inactive')}
+                            className="text-yellow-600 hover:text-yellow-900"
+                            disabled={loading}
+                          >
+                            Deactivate
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => handleStatusChange(user.id, 'active')}
+                            className="text-green-600 hover:text-green-900"
+                            disabled={loading}
+                          >
+                            Activate
+                          </button>
+                        )}
+                        {(isAdmin || (isReceptionist && user.role === 'patient')) && (
+                          <button
+                            onClick={() => handleDeleteUser(user.id)}
+                            className="text-red-600 hover:text-red-900 ml-2"
+                            disabled={loading}
+                          >
+                            Delete
+                          </button>
+                        )}
+                      </div>
+                    </td>
                   </tr>
-                ));
-              })()}
+                ))
+              )}
             </tbody>
           </table>
         </div>
       </div>
     </div>
   );
-};
+}

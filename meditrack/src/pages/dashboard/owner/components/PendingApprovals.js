@@ -54,7 +54,7 @@ export default function PendingApprovals({ count = sampleApprovals.length }) {
         </div>
         {count > 0 && (
           <Link 
-            to="/dashboard/owner/staff/pending" 
+            to="/dashboard/owner/receptionists/pending" 
             className="text-sm text-blue-600 hover:underline flex items-center"
           >
             View all <FaArrowRight className="ml-1 text-xs" />
@@ -107,7 +107,7 @@ export default function PendingApprovals({ count = sampleApprovals.length }) {
           {count > 3 && (
             <div className="text-center mt-2">
               <Link 
-                to="/dashboard/owner/staff/pending" 
+                to="/dashboard/owner/receptionists/pending" 
                 className="text-sm text-blue-600 hover:underline inline-flex items-center"
               >
                 View all {count} pending approvals <FaArrowRight className="ml-1 text-xs" />

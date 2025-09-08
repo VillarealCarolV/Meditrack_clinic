@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { mockPrescriptions } from '../../../../data/mockDoctorData';
-import { FaSearch, FaPlus, FaPrint, FaEdit, FaTrash, FaEye, FaFilter, FaDownload } from 'react-icons/fa';
+import { FaSearch, FaPlus, FaEdit, FaTrash, FaEye, FaFilter, FaPrint, FaDownload } from 'react-icons/fa';
 
 const PrescriptionsPage = () => {
   const [prescriptions, setPrescriptions] = useState(mockPrescriptions);
@@ -232,7 +232,6 @@ const PrescriptionsPage = () => {
                             <FaPrint />
                           </button>
                           <button
-                            className="text-purple-600 hover:text-purple-900 p-1"
                             title="Download"
                           >
                             <FaDownload />

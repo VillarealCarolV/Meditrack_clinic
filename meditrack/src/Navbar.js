@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from './AuthContext';
+import { useAuth } from './contexts/AuthContext';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Menu, Transition } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon, UserCircleIcon } from '@heroicons/react/24/outline';
@@ -8,8 +8,9 @@ const roleToDashboard = {
   patient: '/dashboard/patient',
   doctor: '/dashboard/doctor',
   nurse: '/dashboard/nurse',
-  staff: '/dashboard/staff',
-  owner: '/dashboard/owner',
+  receptionist: '/dashboard/receptionist',
+  // Owner role is merged into admin
+  owner: '/dashboard/admin',
   admin: '/dashboard/admin',
 };
 
@@ -18,23 +19,32 @@ function classNames(...classes) {
 }
 
 function Navbar() {
-  const { user, logout } = useAuth();
+  // Hooks at the top level - must be unconditional
+  const auth = useAuth() || {};
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-
+  
+  // Destructure after hooks
+  const { user, logout, loading } = auth;
+  
+  // Handle scroll effect - always called, but only adds listener when not loading
   useEffect(() => {
+    if (loading) return;
+    
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
     };
+    
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [loading]);
+  
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
+  const handleLogout = async () => {
+    await logout();
+    navigate('/login', { replace: true });
   };
 
   const navigation = [
@@ -47,6 +57,13 @@ function Navbar() {
   const userNavigation = [
     { name: 'Your Profile', href: '/profile' },
     { name: 'Settings', href: '/settings' },
+    // Add role-based navigation
+    ...(user?.role === 'admin' ? [
+      { name: 'Admin Dashboard', href: '/dashboard/admin' },
+    ] : []),
+    ...(user?.role === 'receptionist' ? [
+      { name: 'Receptionist Dashboard', href: '/dashboard/receptionist' },
+    ] : []),
   ];
 
   return (

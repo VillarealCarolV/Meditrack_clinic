@@ -5,7 +5,8 @@ export default function Register() {
   const [formData, setFormData] = useState({
     fullName: '',
     phoneNumber: '',
-    username: '',
+    username
+    : '',
     password: '',
     confirmPassword: '',
     agreeToTerms: false

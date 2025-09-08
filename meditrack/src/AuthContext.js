@@ -45,10 +45,21 @@ export const AuthProvider = ({ children }) => {
 
   // For development/testing only
   const loginAsRole = (role) => {
-    const user = { name: role + ' (dev)', role, email: `${role}@example.com` };
+    // Map staff to receptionist for backward compatibility
+    const normalizedRole = role === 'staff' ? 'receptionist' : role;
+    // Merge owner into admin
+    const effectiveRole = normalizedRole === 'owner' ? 'admin' : normalizedRole;
+    
+    const user = { 
+      name: `${effectiveRole.charAt(0).toUpperCase() + effectiveRole.slice(1)} (dev)`, 
+      role: effectiveRole, 
+      email: `${effectiveRole}@example.com` 
+    };
+    
     setUser(user);
     localStorage.setItem('user', JSON.stringify(user));
-    localStorage.setItem('token', 'dev-token');
+    localStorage.setItem('token', 'dev-token-' + effectiveRole);
+    return user;
   };
 
   const logout = () => {

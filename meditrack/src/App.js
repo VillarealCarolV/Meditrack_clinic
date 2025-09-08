@@ -1,8 +1,6 @@
-import { Routes, Route, Navigate, unstable_HistoryRouter as Router } from 'react-router-dom';
-import { createBrowserHistory } from 'history';
-import { AuthProvider, useAuth } from './AuthContext';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Navbar from './Navbar';
-import { useLocation } from 'react-router-dom';
 import ProtectedRoute from './routes/ProtectedRoute';
 import Unauthorized from './Unauthorized';
 import Login from './pages/Login';
@@ -13,13 +11,15 @@ import DoctorDashboard from './pages/dashboard/doctor/DoctorDashboard';
 import NurseDashboard from './pages/dashboard/nurse/NurseDashboard';
 import OwnerDashboard from './pages/dashboard/owner/OwnerDashboard';
 import AdminDashboard from './pages/dashboard/admin/AdminDashboard';
-import StaffRoutes from './pages/dashboard/staff/StaffRoutes';
+
+import ReceptionistRoutes from './pages/dashboard/receptionist/ReceptionistRoutes';
 import DoctorRoutes from './pages/dashboard/doctor/DoctorRoutes';
+import PatientFormTest from './pages/test/PatientFormTest';
 import './App.css';
 
 // Component to check authentication and redirect accordingly
 const RoleBasedHelpBotWrapper = () => {
-  const { user } = useAuth();
+  const auth = useAuth();
   const location = useLocation();
 
   if (location.pathname === '/login' || 
@@ -28,7 +28,7 @@ const RoleBasedHelpBotWrapper = () => {
     return null;
   }
 
-  if (!user) {
+  if (!auth?.user) {
     return null;
   }
 
@@ -36,7 +36,8 @@ const RoleBasedHelpBotWrapper = () => {
 };
 
 const AuthCheck = ({ children }) => {
-  const { user } = useAuth();
+  const auth = useAuth();
+  const user = auth?.user;
 
   if (!user) {
     return <Navigate to="/login" replace />;
@@ -51,96 +52,75 @@ const AuthCheck = ({ children }) => {
     case 'nurse':
       return <Navigate to="/dashboard/nurse" replace />;
     case 'staff':
-      return <Navigate to="/dashboard/staff" replace />;
+    case 'receptionist':
+      return <Navigate to="/dashboard/receptionist" replace />;
+    // Owner role is merged into admin
     case 'owner':
-      return <Navigate to="/dashboard/owner" replace />;
+      return <Navigate to="/dashboard/admin" replace />;
     case 'patient':
       return <Navigate to="/dashboard/patient" replace />;
     default:
+      console.warn('Unknown user role:', user.role);
       return <Navigate to="/login" replace />;
   }
 };
 
-const history = createBrowserHistory({
-  future: {
-    v7_relativeSplatPath: true,
-  },
-});
+function AppContent() {
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <Navbar />
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/test/patient-form" element={<PatientFormTest />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/unauthorized" element={<Unauthorized />} />
+        
+        {/* Protected Routes */}
+        <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
+          <Route path="/dashboard/admin/*" element={<AdminDashboard />} />
+        </Route>
+        
+        <Route element={<ProtectedRoute allowedRoles={['nurse']} />}>
+          <Route path="/dashboard/nurse" element={<NurseDashboard />} />
+        </Route>
+        
+        <Route element={<ProtectedRoute allowedRoles={['doctor']} />}>
+          <Route path="/dashboard/doctor/*" element={<DoctorRoutes />} />
+        </Route>
+        
+        <Route element={<ProtectedRoute allowedRoles={['staff', 'receptionist']} />}>
+          <Route path="/dashboard/receptionist/*" element={<ReceptionistRoutes />} />
+        </Route>
+        
+        <Route element={<ProtectedRoute allowedRoles={['patient']} />}>
+          <Route path="/dashboard/patient" element={<PatientDashboard />} />
+        </Route>
+        
+        <Route element={<ProtectedRoute allowedRoles={['owner']} />}>
+          <Route path="/dashboard/owner" element={<OwnerDashboard />} />
+        </Route>
+        
+        <Route element={<ProtectedRoute allowedRoles={['admin', 'nurse', 'doctor', 'receptionist', 'patient', 'owner']} />}>
+          <Route path="/profile" element={<Profile />} />
+        </Route>
+        
+        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/dashboard" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+      <RoleBasedHelpBotWrapper />
+    </div>
+  );
+}
 
 function App() {
   return (
-    <Router history={history}>
+    <BrowserRouter>
       <AuthProvider>
-        <div className="min-h-screen bg-gray-50">
-          <Navbar />
-          <RoleBasedHelpBotWrapper />
-          <Routes>
-            {/* Public Routes */}
-            <Route path="/" element={
-              <AuthCheck>
-                <h1 className="text-3xl text-red-300 bg-slate-600 p-4">Welcome to Meditrack Clinic</h1>
-              </AuthCheck>
-            } />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/unauthorized" element={<Unauthorized />} />
-
-            {/* Protected Routes */}
-            <Route path="/dashboard/patient" element={
-              <ProtectedRoute allowedRoles={["patient"]}>
-                <PatientDashboard />
-              </ProtectedRoute>
-            } />
-
-            <Route path="/dashboard/doctor" element={
-              <ProtectedRoute allowedRoles={["doctor"]}>
-                <DoctorDashboard />
-              </ProtectedRoute>
-            } />
-
-            <Route path="/dashboard/doctor/*" element={
-              <ProtectedRoute allowedRoles={["doctor"]}>
-                <DoctorRoutes />
-              </ProtectedRoute>
-            } />  
-
-            <Route path="/dashboard/nurse" element={
-              <ProtectedRoute allowedRoles={["nurse"]}>
-                <NurseDashboard />
-              </ProtectedRoute>
-            } />
-
-            <Route path="/dashboard/staff/*" element={
-              <ProtectedRoute allowedRoles={["staff"]}>
-                <StaffRoutes />
-              </ProtectedRoute>
-            } />
-
-            <Route path="/dashboard/owner" element={
-              <ProtectedRoute allowedRoles={["owner"]}>
-                <OwnerDashboard />
-              </ProtectedRoute>
-            } />
-
-            <Route path="/dashboard/admin/*" element={
-              <ProtectedRoute allowedRoles={["admin"]}>
-                <AdminDashboard />
-              </ProtectedRoute>
-            } />
-
-            <Route path="/profile" element={
-              <ProtectedRoute allowedRoles={["admin", "owner", "staff", "doctor", "nurse", "patient"]}>
-                <Profile />
-              </ProtectedRoute>
-            } />
-
-            {/* Fallback routes */}
-            <Route path="/dashboard" element={<Navigate to="/" replace />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </div>
+        <AppContent />
       </AuthProvider>
-    </Router>
+    </BrowserRouter>
   );
 }
 

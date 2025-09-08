@@ -1,12 +1,22 @@
-import React from 'react';
+ import React from 'react';
+import { 
+  mockNurses, 
+  mockVitalSigns as mockVitals, 
+  mockNursingNotes as mockNotes, 
+  mockMedicationAdministration as mockMedLogs,
+  // Note: mockFlags is not in the exports, using empty array as fallback
+} from '../../../data/mockNurseData';
+import RoleBasedHelpBot from '../../../components/RoleBasedHelpBot';
 import NurseSidebar from './NurseSidebar';
 import MedicalRecordsTable from './MedicalRecordsTable';
 import VitalsObservationsForm from './VitalsObservationsForm';
 import NurseNotesPanel from './NurseNotesPanel';
 import MedicationLogTable from './MedicationLogTable';
 import CriticalFlagPanel from './CriticalFlagPanel';
-import { mockRecords, mockVitals, mockNotes, mockMedLogs, mockIntake, mockFlags } from '../../../data/mockNurseData';
-import RoleBasedHelpBot from '../../../components/RoleBasedHelpBot';
+
+// Mock data for components that don't have corresponding exports yet
+const mockRecords = [];
+const mockFlags = [];
 
 export default function NurseDashboard() {
   return (

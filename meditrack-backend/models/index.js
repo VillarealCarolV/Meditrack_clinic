@@ -1,21 +1,35 @@
-const { sequelize } = require('../config/db');
-const User = require('./User');
+const { sequelize } = require('../config/database');
+const fs = require('fs');
+const path = require('path');
+const { DataTypes } = require('sequelize');
+const basename = path.basename(__filename);
 
-// Initialize models
-const models = {
-  User: User(sequelize, require('sequelize').DataTypes),
-  // Add other models here when needed
+// Define models in the correct order to handle dependencies
+const modelDefiners = {
+  // Core models
+  User: require('./User')(sequelize, DataTypes),
+  
+  // Other models that don't have dependencies
+  // ...
+  
+  // Models with dependencies
+  ScheduleChangeRequest: require('./ScheduleChangeRequest')(sequelize, DataTypes),
+  ScheduleSlot: require('./ScheduleSlot')(sequelize, DataTypes),
+  Notification: require('./Notification')(sequelize, DataTypes)
 };
 
-// Run associations if any
-Object.values(models)
-  .filter(model => typeof model.associate === 'function')
-  .forEach(model => model.associate(models));
+// Run associations
+Object.values(modelDefiners).forEach(model => {
+  if (model.associate) {
+    model.associate(modelDefiners);
+  }
+});
 
+// Add sequelize and Sequelize to the exported object
 const db = {
-  ...models,
+  ...modelDefiners,
   sequelize,
-  Sequelize: require('sequelize'),
+  Sequelize: require('sequelize')
 };
 
 module.exports = db;

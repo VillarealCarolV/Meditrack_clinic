@@ -1,5 +1,6 @@
 import React from 'react';
-import { mockReports, mockPatients, mockPrescriptions, mockSchedule } from '../../../data/mockDoctorData';
+import { mockDoctors, mockPrescriptions, mockSchedule } from '../../../data/mockDoctorData';
+import { mockPatients } from '../../../data/mockPatientData';
 import DoctorSidebar from './DoctorSidebar';
 import RoleBasedHelpBot from '../../../components/RoleBasedHelpBot';
 

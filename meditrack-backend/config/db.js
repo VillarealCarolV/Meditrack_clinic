@@ -9,6 +9,26 @@ const sequelize = new Sequelize(
     host: process.env.DB_HOST || 'localhost',
     dialect: 'mysql',
     logging: false, // Disable logging for production
+    dialectOptions: {
+      // Handle special characters in passwords
+      charset: 'utf8mb4',
+      decimalNumbers: true,
+      supportBigNumbers: true,
+      bigNumberStrings: false,
+      typeCast: true,
+      multipleStatements: true,
+      connectTimeout: 10000
+    },
+    define: {
+      timestamps: true,
+      underscored: true
+    },
+    pool: {
+      max: 5,
+      min: 0,
+      acquire: 30000,
+      idle: 10000
+    }
   }
 );
 

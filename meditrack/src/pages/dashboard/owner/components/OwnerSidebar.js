@@ -17,17 +17,9 @@ import {
 const menuItems = [
   { name: 'Dashboard', icon: <FaHome className="mr-3" />, path: '/dashboard/owner' },
   { name: 'Appointments', icon: <FaCalendarAlt className="mr-3" />, path: '/dashboard/owner/appointments' },
-  { 
-    name: 'Staff Management', 
-    icon: <FaUserShield className="mr-3" />, 
-    path: '/dashboard/owner/staff',
-    subItems: [
-      { name: 'All Staff', path: '/dashboard/owner/staff' },
-      { name: 'Doctors', path: '/dashboard/owner/staff/doctors' },
-      { name: 'Nurses', path: '/dashboard/owner/staff/nurses' },
-      { name: 'Add New', path: '/dashboard/owner/staff/new' },
-    ]
-  },
+  { name: 'Receptionists', icon: <FaUserFriends className="mr-3" />, path: '/dashboard/owner/receptionists' },
+  { name: 'Doctors', icon: <FaUserMd className="mr-3" />, path: '/dashboard/owner/doctors' },
+  { name: 'Nurses', icon: <FaUserNurse className="mr-3" />, path: '/dashboard/owner/nurses' },
   { name: 'Patients', icon: <FaUserFriends className="mr-3" />, path: '/dashboard/owner/patients' },
   { name: 'Medical Records', icon: <FaClipboardList className="mr-3" />, path: '/dashboard/owner/records' },
   { name: 'Reports', icon: <FaFileAlt className="mr-3" />, path: '/dashboard/owner/reports' },

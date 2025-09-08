@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import StaffSidebar from './StaffSidebar';
+import ReceptionistSidebar from './ReceptionistSidebar';
 
 import { 
   Search, Filter, Calendar as CalendarIcon, List, Plus, Edit, Trash2, Check, X, Clock, User, Phone, Mail, Info, AlertCircle 
